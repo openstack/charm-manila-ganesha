@@ -1,0 +1,73 @@
+series: bionic
+variables:
+  source: &source cloud:bionic-rocky
+services:
+  manila-ganesha:
+    num_units: 1
+    series: bionic
+    charm: ../../../manila-ganesha
+    options:
+      openstack-origin: *source
+  ceph-mon:
+    charm: cs:~openstack-charmers-next/ceph-mon
+    num_units: 3
+    options:
+      source: *source
+  ceph-osd:
+    charm: cs:~openstack-charmers-next/ceph-osd
+    num_units: 3
+    options:
+      source: *source
+    storage:
+      osd-devices: 'cinder,10G'
+  ceph-fs:
+    charm: cs:~openstack-charmers-next/ceph-fs
+    num_units: 2
+    options:
+      source: *source
+  manila:
+    charm: cs:~openstack-charmers-next/manila
+    num_units: 1
+    options:
+      openstack-origin: *source
+      default-share-backend: ganesha
+      share-protocols: NFS
+  rabbitmq-server:
+    charm: cs:~openstack-charmers-next/rabbitmq-server
+    num_units: 1
+    options:
+      source: *source
+  percona-cluster:
+    charm: cs:~openstack-charmers-next/percona-cluster
+    num_units: 1
+    options:
+      source: *source
+  keystone:
+    charm: cs:~openstack-charmers-next/keystone
+    num_units: 1
+    options:
+      openstack-origin: *source
+
+relations:
+  - - ceph-mon
+    - ceph-osd
+  - - ceph-mon
+    - ceph-fs
+  - - ceph-mon
+    - manila-ganesha
+  - - manila-ganesha
+    - percona-cluster
+  - - manila-ganesha
+    - rabbitmq-server
+  - - manila-ganesha
+    - keystone
+  - - manila
+    - manila-ganesha
+  - - manila
+    - rabbitmq-server
+  - - manila
+    - keystone
+  - - keystone
+    - percona-cluster
+  - - manila
+    - percona-cluster

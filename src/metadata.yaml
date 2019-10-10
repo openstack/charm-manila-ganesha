@@ -1,0 +1,28 @@
+name: manila-ganesha
+summary: Manila-Ganesha allows binding Manila to CephFS via Ganesha
+maintainer: OpenStack Charmers <openstack-charmers@lists.ubuntu.com>
+description: |
+  Nfs-ganesha is a user-mode file server for NFS v3, 4.0, 4.1, 4.1 pNFS,
+  and 4.2; and for 9P from the Plan9 operating system. It can support
+  all these protocols concurrently. Manila-Ganesha allows connecting
+  a Manila server to a Ceph cluster via CephFS.
+tags:
+  - storage
+  - file-servers
+series:
+  - bionic
+  - disco
+  - eoan
+subordinate: false
+provides:
+  manila-plugin:
+    interface: manila-plugin
+requires:
+  ceph:
+    interface: ceph-client
+  shared-db:
+    interface: mysql-shared
+  amqp:
+    interface: rabbitmq
+  identity-service:
+    interface: keystone-credentials

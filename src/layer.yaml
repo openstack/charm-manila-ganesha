@@ -1,0 +1,12 @@
+includes:
+  - layer:openstack-api
+  - layer:ceph
+  - interface:ceph-client
+  - interface:mysql-shared
+  - interface:rabbitmq
+  - interface:keystone-credentials
+  - interface:manila-plugin
+options:
+  basic:
+    use_venv: True
+    include_system_packages: False

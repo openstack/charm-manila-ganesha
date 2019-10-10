@@ -1,0 +1,12 @@
+charm_name: manila-ganesha
+configure: []
+dev_bundles:
+- bionic
+gate_bundles:
+- bionic-rocky
+- bionic-queens
+- bionic-stein
+smoke_bundles:
+- bionic-stein
+target_deploy_status: {}
+tests: []
