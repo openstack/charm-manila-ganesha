@@ -24,14 +24,14 @@ charm.use_defaults(
 
 @reactive.when('ceph.connected')
 @reactive.when_not('ceph.available')
-def storage_ceph_connected(ceph):
+def ceph_connected(ceph):
     ceph.create_pool(ch_core.hookenv.service_name())
 
 
 @reactive.when('manila-plugin.available')
 def setup_manila():
     manila_relation = relations.endpoint_from_flag('manila-plugin.available')
-    manila_relation.name = 'ganesha'
+    manila_relation.name = 'cephfsnfs1'
     manila_relation.configuration_data = {
         'complete': True,
     }
@@ -42,7 +42,7 @@ def configure_ident_username(keystone):
     """Requests a user to the Identity Service
     """
     username = 'manila'
-    keystone.register_endpoints(username, 'None', 'None', 'None', 'None')
+    keystone.request_credentials(username)
 
 
 @reactive.when('ceph.available',

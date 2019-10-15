@@ -1,6 +1,6 @@
 includes:
   - layer:openstack-api
-  - layer:ceph
+  # - layer:ceph
   - interface:ceph-client
   - interface:mysql-shared
   - interface:rabbitmq

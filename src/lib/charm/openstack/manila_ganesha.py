@@ -31,6 +31,7 @@ MANILA_DIR = '/etc/manila/'
 MANILA_CONF = MANILA_DIR + "manila.conf"
 MANILA_LOGGING_CONF = MANILA_DIR + "logging.conf"
 MANILA_API_PASTE_CONF = MANILA_DIR + "api-paste.ini"
+CEPH_CONF = '/etc/ceph/ceph.conf'
 
 
 @charms_openstack.adapters.config_property
@@ -41,7 +42,66 @@ def access_ip(config):
     This one is for manila.conf
     :returns list of lines: the config for the manila.conf file
     """
-    return config.charm_instance.access_ip()
+    return config.charm_instance.access_ip
+
+
+@charms_openstack.adapters.config_property
+def use_memcache(config):
+    """Do not enable memcache."""
+    return False
+
+
+class KeystoneCredentialAdapter(
+    charms_openstack.adapters.OpenStackRelationAdapter):
+    """Modifies the keystone-credentials interface to act like keystone."""
+
+    def __init__(self, relation):
+        super(KeystoneCredentialAdapter, self).__init__(relation)
+        self.service_domain
+        self.service_domain_id
+        self.service_host
+        self.service_password
+        self.service_port
+        self.service_protocol
+        self.service_tenant
+        self.service_tenant_id
+        self.service_username
+
+    @property
+    def service_domain(self):
+        return self.credentials_user_domain_name
+
+    @property
+    def service_domain_id(self):
+        return self.credentials_user_domain_id
+
+    @property
+    def service_host(self):
+        return self.credentials_host
+
+    @property
+    def service_password(self):
+        return self.credentials_password
+
+    @property
+    def service_port(self):
+        return self.credentials_port
+
+    @property
+    def service_protocol(self):
+        return self.credentials_protocol
+
+    @property
+    def service_tenant(self):
+        return self.credentials_project
+
+    @property
+    def service_tenant_id(self):
+        return self.credentials_project_id
+
+    @property
+    def service_username(self):
+        return self.credentials_username
 
 
 class GaneshaCharmRelationAdapters(
@@ -50,6 +110,8 @@ class GaneshaCharmRelationAdapters(
         'amqp': charms_openstack.adapters.RabbitMQRelationAdapter,
         'ceph': charms_openstack.plugins.CephRelationAdapter,
         'manila-gahesha': charms_openstack.adapters.OpenStackRelationAdapter,
+        'identity-service': KeystoneCredentialAdapter,
+        'shared_db': charms_openstack.adapters.DatabaseRelationAdapter,
     }
 
 
@@ -92,17 +154,16 @@ class ManilaGaneshaCharm(charms_openstack.charm.HAOpenStackCharm,
 
     @property
     def restart_map(self):
-        services = self.services
         return {
             MANILA_CONF: ['manila-share'],
             MANILA_API_PASTE_CONF: ['manila-share'],
             MANILA_LOGGING_CONF: ['manila-share'],
-
+            CEPH_CONF: ['manila-share'],
         }
 
     @property
     def access_ip(self):
-        resolve_address()
+        return resolve_address()
 
     def enable_memcache(self, *args, **kwargs):
         return False
