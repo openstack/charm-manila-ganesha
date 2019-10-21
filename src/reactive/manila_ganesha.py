@@ -26,7 +26,8 @@ charm.use_defaults(
 @reactive.when_not('ceph.available')
 def ceph_connected(ceph):
     ceph.create_pool(ch_core.hookenv.service_name())
-
+    with charm.provide_charm_instance() as charm_instance:
+        charm_instance.request_ceph_permissions(ceph)
 
 @reactive.when('manila-plugin.available')
 def setup_manila():

@@ -9,7 +9,7 @@ services:
     options:
       openstack-origin: *source
   ceph-mon:
-    charm: cs:~openstack-charmers-next/ceph-mon
+    charm: /home/ubuntu/ceph-mon
     num_units: 3
     options:
       source: *source

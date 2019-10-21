@@ -13,7 +13,8 @@
 # limitations under the License.
 
 import collections
-# import json
+import json
+
 # import socket
 # import subprocess
 
@@ -23,7 +24,12 @@ import charms_openstack.charm
 import charms_openstack.adapters
 import charms_openstack.plugins
 from charms_openstack.ip import resolve_address
-
+from charmhelpers.core.hookenv import log
+from charmhelpers.contrib.storage.linux.ceph import (
+    CephBrokerRq,
+    is_request_complete,
+    send_request_if_needed,
+)
 # import charmhelpers.core as ch_core
 
 
@@ -32,6 +38,15 @@ MANILA_CONF = MANILA_DIR + "manila.conf"
 MANILA_LOGGING_CONF = MANILA_DIR + "logging.conf"
 MANILA_API_PASTE_CONF = MANILA_DIR + "api-paste.ini"
 CEPH_CONF = '/etc/ceph/ceph.conf'
+CEPH_CAPABILITIES = [
+    "mds", "allow *",
+    "osd", "allow rw",
+    "mon", "allow r, "
+    "allow command \"auth del\", "
+    "allow command \"auth caps\", "
+    "allow command \"auth get\", "
+    "allow command \"auth get-or-create\""]
+
 
 
 @charms_openstack.adapters.config_property
@@ -134,9 +149,10 @@ class ManilaGaneshaCharm(charms_openstack.charm.HAOpenStackCharm,
         'identity-service',
         'shared-db',
     ]
-    group = 'manila'
+    user = group = 'manila'
+
     adapters_class = GaneshaCharmRelationAdapters
-    ceph_key_per_unit_name = True
+    # ceph_key_per_unit_name = True
     services = [
         'nfs-ganesha',
         'manila-share',
@@ -193,3 +209,22 @@ class ManilaGaneshaCharm(charms_openstack.charm.HAOpenStackCharm,
                 database=self.options.database,
                 username=self.options.database_user, )
         ]
+
+    def request_ceph_permissions(self, ceph):
+        rq = CephBrokerRq()
+
+        json_rq = ceph.get_local(key='broker_req')
+        if json_rq:
+            try:
+                j = json.loads(json_rq)
+                log("Json request: {}".format(json_rq))
+                rq.set_ops(j['ops'])
+            except ValueError as err:
+                log("Unable to decode broker_req: {}. Error {}".format(
+                    json_rq, err))
+
+        rq.add_op({'op': 'set-key-permissions',
+                   'permissions': CEPH_CAPABILITIES,
+                   'client': 'manila-ganesha'})
+        ceph.set_local(key='broker_req', value=rq.request)
+        send_request_if_needed(rq, relation='ceph')
