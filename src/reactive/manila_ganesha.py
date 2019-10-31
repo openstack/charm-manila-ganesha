@@ -1,3 +1,5 @@
+import subprocess
+
 import charms.reactive as reactive
 
 import charms_openstack.bus
@@ -74,3 +76,18 @@ def render_things(*args):
             ch_core.host.service('start', service)
         reactive.set_flag('config.rendered')
         charm_instance.assess_status()
+
+
+@reactive.when_all('config.rendered',
+                   'ceph.pools.available')
+@reactive.when_not('ganesha_pool_configured')
+def configure_ganesha(*args):
+    cmd = [
+        'rados', '-p', 'manila-ganesha', '--id', 'manila-ganesha',
+        'put', 'ganesha-export-index', '/dev/null'
+    ]
+    try:
+        subprocess.check_call(cmd)
+        reactive.set_flag('ganesha_pool_configured')
+    except subprocess.CalledProcessError:
+        log("Failed to setup ganesha index object")

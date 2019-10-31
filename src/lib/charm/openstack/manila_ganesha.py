@@ -16,7 +16,7 @@ import collections
 import json
 
 # import socket
-# import subprocess
+import subprocess
 
 # import charms.reactive as reactive
 
@@ -38,6 +38,7 @@ MANILA_CONF = MANILA_DIR + "manila.conf"
 MANILA_LOGGING_CONF = MANILA_DIR + "logging.conf"
 MANILA_API_PASTE_CONF = MANILA_DIR + "api-paste.ini"
 CEPH_CONF = '/etc/ceph/ceph.conf'
+
 CEPH_CAPABILITIES = [
     "mds", "allow *",
     "osd", "allow rw",
@@ -171,10 +172,10 @@ class ManilaGaneshaCharm(charms_openstack.charm.HAOpenStackCharm,
     @property
     def restart_map(self):
         return {
-            MANILA_CONF: ['manila-share'],
-            MANILA_API_PASTE_CONF: ['manila-share'],
-            MANILA_LOGGING_CONF: ['manila-share'],
-            CEPH_CONF: ['manila-share'],
+            MANILA_CONF: ['manila-share', 'nfs-ganesha'],
+            MANILA_API_PASTE_CONF: ['manila-share', 'nfs-ganesha'],
+            MANILA_LOGGING_CONF: ['manila-share', 'nfs-ganesha'],
+            CEPH_CONF: ['manila-share', 'nfs-ganesha'],
         }
 
     @property
