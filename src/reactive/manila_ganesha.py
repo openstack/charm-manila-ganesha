@@ -17,7 +17,6 @@ charm.use_defaults(
     'charm.installed',
     'amqp.connected',
     'shared-db.connected',
-    # 'identity-service.connected',
     'config.changed',
     'update-status',
     'upgrade-charm',
