@@ -7,6 +7,7 @@ import charms_openstack.charm as charm
 import charms.reactive.relations as relations
 
 import charmhelpers.core as ch_core
+from charmhelpers.core.hookenv import log
 
 
 charms_openstack.bus.discover()
@@ -31,6 +32,7 @@ def ceph_connected(ceph):
     with charm.provide_charm_instance() as charm_instance:
         charm_instance.request_ceph_permissions(ceph)
 
+
 @reactive.when('manila-plugin.available')
 def setup_manila():
     manila_relation = relations.endpoint_from_flag('manila-plugin.available')
@@ -38,6 +40,7 @@ def setup_manila():
     manila_relation.configuration_data = {
         'complete': True,
     }
+
 
 @reactive.when_not('identity-service.available')
 @reactive.when('identity-service.connected')
@@ -80,7 +83,7 @@ def render_things(*args):
 
 @reactive.when_all('config.rendered',
                    'ceph.pools.available')
-@reactive.when_not('ganesha_pool_configured')
+@reactive.when_not('ganesha-pool-configured')
 def configure_ganesha(*args):
     cmd = [
         'rados', '-p', 'manila-ganesha', '--id', 'manila-ganesha',
@@ -88,6 +91,6 @@ def configure_ganesha(*args):
     ]
     try:
         subprocess.check_call(cmd)
-        reactive.set_flag('ganesha_pool_configured')
+        reactive.set_flag('ganesha-pool-configured')
     except subprocess.CalledProcessError:
         log("Failed to setup ganesha index object")

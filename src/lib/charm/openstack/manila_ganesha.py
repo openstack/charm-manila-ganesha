@@ -15,9 +15,6 @@
 import collections
 import json
 
-# import socket
-import subprocess
-
 # import charms.reactive as reactive
 
 import charms_openstack.charm
@@ -27,7 +24,6 @@ from charms_openstack.ip import resolve_address
 from charmhelpers.core.hookenv import log
 from charmhelpers.contrib.storage.linux.ceph import (
     CephBrokerRq,
-    is_request_complete,
     send_request_if_needed,
 )
 # import charmhelpers.core as ch_core
@@ -49,7 +45,6 @@ CEPH_CAPABILITIES = [
     "allow command \"auth get-or-create\""]
 
 
-
 @charms_openstack.adapters.config_property
 def access_ip(config):
     """Return the list of lines from the backends that need to go into the
@@ -68,7 +63,7 @@ def use_memcache(config):
 
 
 class KeystoneCredentialAdapter(
-    charms_openstack.adapters.OpenStackRelationAdapter):
+        charms_openstack.adapters.OpenStackRelationAdapter):
     """Modifies the keystone-credentials interface to act like keystone."""
 
     def __init__(self, relation):

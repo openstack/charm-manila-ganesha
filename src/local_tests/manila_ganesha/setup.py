@@ -1,11 +1,7 @@
-import logging
 import zaza.openstack.utilities.openstack as openstack_utils
 
 from manilaclient import client as manilaclient
 
-def noop():
-    """Run setup."""
-    logging.info('OK')
 
 def setup_ganesha_share_type(manila_client=None):
     if manila_client is None:

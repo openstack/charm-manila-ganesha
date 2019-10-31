@@ -16,11 +16,8 @@
 
 """Encapsulate Manila Ganesha testing."""
 
-import logging
-
 from manilaclient import client as manilaclient
 
-import zaza.model
 import zaza.openstack.charm_tests.glance.setup as glance_setup
 import zaza.openstack.charm_tests.neutron.tests as neutron_tests
 import zaza.openstack.charm_tests.nova.utils as nova_utils
@@ -41,7 +38,6 @@ class ManilaGaneshaTests(test_utils.OpenStackBaseTest):
             openstack_utils.get_nova_session_client(cls.keystone_session))
         cls.manila_client = manilaclient.Client(
             session=cls.keystone_session, client_version='2')
-
 
     def test_manila_share(self):
         """Test that Manila + Ganesha shares can be accessed on two instances.
@@ -104,7 +100,7 @@ class ManilaGaneshaTests(test_utils.OpenStackBaseTest):
             'sudo apt install -yq nfs-common && '
             'sudo /bin/mkdir -p /mnt/ceph && '
             'sudo /bin/mount -t nfs -o nfsvers=4.1,proto=tcp {} /mnt/ceph'
-                .format(mount_path),
+            .format(mount_path),
             password=password, privkey=privkey, verify=verify_setup)
 
         def verify(stdin, stdout, stderr):
@@ -122,5 +118,3 @@ class ManilaGaneshaTests(test_utils.OpenStackBaseTest):
             'sudo cat /mnt/ceph/test'.format(
                 mount_path),
             password=password, privkey=privkey, verify=verify)
-
-
