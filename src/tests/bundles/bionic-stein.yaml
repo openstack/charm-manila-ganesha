@@ -9,7 +9,7 @@ services:
     options:
       openstack-origin: *source
   ceph-mon:
-    charm: /home/ubuntu/ceph-mon
+    charm: cs:~openstack-charmers-next/ceph-mon
     num_units: 3
     options:
       source: *source
@@ -27,7 +27,7 @@ services:
       source: *source
   manila:
     # charm: cs:~openstack-charmers-next/manila
-    charm: /home/ubuntu/manila/build/builds/manila
+    charm: cs:~openstack-charmers-next/manila
     num_units: 1
     options:
       openstack-origin: *source

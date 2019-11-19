@@ -3,10 +3,10 @@ dev_bundles:
 - bionic
 gate_bundles:
 - bionic-rocky
-- bionic-queens
 - bionic-stein
+- bionic-train
 smoke_bundles:
-- bionic-stein
+- bionic-train
 target_deploy_status: {}
 tests:
   - local_tests.manila_ganesha.tests.ManilaGaneshaTests

@@ -135,6 +135,8 @@ class ManilaGaneshaCharm(charms_openstack.charm.HAOpenStackCharm,
     source_config_key = 'openstack-origin'
     packages = [
         'ceph-common',
+        'python3-cephfs',
+        'python3-rados',
         'nfs-ganesha-ceph',
         'manila-share',
         'python3-manila',
