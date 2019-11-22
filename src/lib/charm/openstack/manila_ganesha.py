@@ -20,7 +20,7 @@ import json
 import charms_openstack.charm
 import charms_openstack.adapters
 import charms_openstack.plugins
-from charms_openstack.ip import resolve_address
+import charmhelpers.contrib.network.ip as ch_net_ip
 from charmhelpers.core.hookenv import log
 from charmhelpers.contrib.storage.linux.ceph import (
     CephBrokerRq,
@@ -177,7 +177,7 @@ class ManilaGaneshaCharm(charms_openstack.charm.HAOpenStackCharm,
 
     @property
     def access_ip(self):
-        return resolve_address()
+        return ch_net_ip.get_relation_ip('tenant-storage')
 
     def enable_memcache(self, *args, **kwargs):
         return False
