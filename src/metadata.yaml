@@ -13,6 +13,7 @@ series:
   - bionic
   - disco
   - eoan
+  - focal
 subordinate: false
 extra-bindings:
   tenant-storage:
