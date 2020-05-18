@@ -21,7 +21,11 @@ import charms_openstack.charm
 import charms_openstack.adapters
 import charms_openstack.plugins
 import charmhelpers.contrib.network.ip as ch_net_ip
-from charmhelpers.core.hookenv import log
+from charmhelpers.core.hookenv import (
+    config,
+    log,
+)
+from charmhelpers.contrib.hahelpers.cluster import is_clustered
 from charmhelpers.contrib.storage.linux.ceph import (
     CephBrokerRq,
     send_request_if_needed,
@@ -54,6 +58,11 @@ def access_ip(config):
     :returns list of lines: the config for the manila.conf file
     """
     return config.charm_instance.access_ip
+
+
+@charms_openstack.adapters.config_property
+def local_ip(_config):
+    return ch_net_ip.get_relation_ip('tenant-storage')
 
 
 @charms_openstack.adapters.config_property
@@ -152,8 +161,8 @@ class ManilaGaneshaCharm(charms_openstack.charm.HAOpenStackCharm,
     adapters_class = GaneshaCharmRelationAdapters
     # ceph_key_per_unit_name = True
     services = [
-        'nfs-ganesha',
-        'manila-share',
+        # 'nfs-ganesha',
+        # 'manila-share',
     ]
     ha_resources = ['vips', 'dnsha']
     release_pkg = 'manila-common'
@@ -177,7 +186,19 @@ class ManilaGaneshaCharm(charms_openstack.charm.HAOpenStackCharm,
 
     @property
     def access_ip(self):
-        return ch_net_ip.get_relation_ip('tenant-storage')
+        vips = config().get('vip')
+        if vips:
+            vips = vips.split()
+        clustered = is_clustered()
+        net_addr = ch_net_ip.get_relation_ip('tenant-storage')
+        bound_cidr = ch_net_ip.resolve_network_cidr(
+            ch_net_ip.network_get_primary_address('tenant-storage')
+        )
+        if clustered and vips:
+            for vip in vips:
+                if ch_net_ip.is_address_in_network(bound_cidr, vip):
+                    return vip
+        return net_addr
 
     def enable_memcache(self, *args, **kwargs):
         return False

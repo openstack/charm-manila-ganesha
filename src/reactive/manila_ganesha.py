@@ -16,6 +16,7 @@ charms_openstack.bus.discover()
 charm.use_defaults(
     'charm.installed',
     'amqp.connected',
+    'cluster.available',
     'shared-db.connected',
     'config.changed',
     'update-status',
@@ -80,6 +81,15 @@ def render_things(*args):
         charm_instance.assess_status()
 
 
+@reactive.when('config.rendered')
+@reactive.when_not('ha.connected')
+def enable_services_in_non_ha():
+    with charm.provide_charm_instance() as charm_instance:
+        for service in charm_instance.services:
+            ch_core.host.service('enable', service)
+            ch_core.host.service('start', service)
+
+
 @reactive.when_all('config.rendered',
                    'ceph.pools.available')
 @reactive.when_not('ganesha-pool-configured')
@@ -93,3 +103,37 @@ def configure_ganesha(*args):
         reactive.set_flag('ganesha-pool-configured')
     except subprocess.CalledProcessError:
         log("Failed to setup ganesha index object")
+
+
+@reactive.when('ha.connected', 'ganesha-pool-configured',
+               'config.rendered')
+def cluster_connected(hacluster):
+    """Configure HA resources in corosync"""
+    with charm.provide_charm_instance() as this_charm:
+        this_charm.configure_ha_resources(hacluster)
+        for service in ['nfs-ganesha', 'manila-share']:
+            ch_core.host.service('disable', service)
+            ch_core.host.service('stop', service)
+        hacluster.add_systemd_service('nfs-ganesha',
+                                      'nfs-ganesha',
+                                      clone=False)
+        hacluster.add_systemd_service('manila-share',
+                                      'manila-share',
+                                      clone=False)
+        # This is a bit of a nasty hack to ensure that we can colocate the
+        # services to make manila + ganesha colocate. This can be tidied up
+        # once
+        # https://bugs.launchpad.net/charm-interface-hacluster/+bug/1880644
+        # is resolved
+        import hooks.relations.hacluster.common as hacluster_common  # noqa
+        crm = hacluster_common.CRM()
+        crm.colocation('ganesha_with_vip',
+                       'inf',
+                       'res_nfs_ganesha_nfs_ganesha',
+                       'grp_ganesha_vips')
+        crm.colocation('manila_with_vip',
+                       'inf',
+                       'res_manila_share_manila_share',
+                       'grp_ganesha_vips')
+        hacluster.manage_resources(crm)
+        this_charm.assess_status()
