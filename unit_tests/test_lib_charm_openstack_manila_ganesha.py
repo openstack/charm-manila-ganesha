@@ -29,7 +29,7 @@ class Helper(test_utils.PatchHelper):
         self.patch_release(manila_ganesha.ManilaGaneshaCharm.release)
 
 
-class TestOctaviaCharm(Helper):
+class TestManilaGaneshaCharm(Helper):
 
     def test_request_ceph_permissions(self):
         self.patch_object(manila_ganesha, 'send_request_if_needed')
@@ -39,3 +39,32 @@ class TestOctaviaCharm(Helper):
         c.request_ceph_permissions(ceph)
         ceph.set_local.assert_called_once()
         self.send_request_if_needed.assert_called_once()
+
+    def test_access_ip_without_vip(self):
+        self.patch_object(manila_ganesha, 'is_clustered')
+        self.patch_object(manila_ganesha.ch_net_ip, 'get_relation_ip')
+        self.patch_object(manila_ganesha.ch_net_ip, 'is_address_in_network')
+        self.is_clustered.return_value = False
+        self.get_relation_ip.return_value = "10.0.0.1"
+        c = manila_ganesha.ManilaGaneshaCharm()
+        self.assertEqual(c.access_ip, "10.0.0.1")
+        self.is_clustered.assert_called_once()
+        self.get_relation_ip.assert_called_once_with('tenant-storage')
+        self.is_address_in_network.assert_not_called()
+
+    def test_access_ip_with_vip(self):
+        self.patch_object(manila_ganesha, 'config')
+        self.patch_object(manila_ganesha, 'is_clustered')
+        self.patch_object(manila_ganesha.ch_net_ip, 'get_relation_ip')
+        self.patch_object(manila_ganesha.ch_net_ip, 'is_address_in_network')
+        self.patch_object(manila_ganesha.ch_net_ip, 'resolve_network_cidr')
+        self.config.return_value = {'vip': '10.0.0.10'}
+        self.is_clustered.return_value = True
+        self.get_relation_ip.return_value = "10.0.0.1"
+        self.resolve_network_cidr.return_value = '10.0.0.0/24'
+        c = manila_ganesha.ManilaGaneshaCharm()
+        self.assertEqual(c.access_ip, "10.0.0.10")
+        self.is_clustered.assert_called_once()
+        self.get_relation_ip.assert_called_once_with('tenant-storage')
+        self.is_address_in_network.assert_called_once_with(
+            '10.0.0.0/24', '10.0.0.10')

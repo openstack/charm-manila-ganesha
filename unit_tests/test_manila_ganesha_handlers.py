@@ -46,11 +46,16 @@ class TestRegisteredHooks(test_utils.TestRegisteredHooks):
                                   'manila-plugin.available',
                                   'shared-db.available',
                                   'identity-service.available'),
+                'cluster_connected': ('ha.connected',
+                                      'ganesha-pool-configured',
+                                      'config.rendered',),
+                'enable_services_in_non_ha': ('config.rendered',),
             },
             'when_not': {
                 'ceph_connected': ('ceph.available',),
                 'configure_ident_username': ('identity-service.available',),
                 'configure_ganesha': ('ganesha-pool-configured',),
+                'enable_services_in_non_ha': ('ha.connected',),
             },
             'when_all': {
                 'configure_ganesha': ('config.rendered',

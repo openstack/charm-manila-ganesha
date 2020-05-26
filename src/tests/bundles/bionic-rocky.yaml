@@ -3,7 +3,7 @@ options:
   source: &source cloud:bionic-rocky
 services:
   manila-ganesha:
-    num_units: 1
+    num_units: 3
     series: bionic
     charm: ../../../manila-ganesha
     options:
