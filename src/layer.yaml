@@ -10,3 +10,10 @@ options:
   basic:
     use_venv: True
     include_system_packages: False
+config:
+  deletes:
+    - region
+    - ssl_ca
+    - ssl_cert
+    - ssl_key
+    - verbose
