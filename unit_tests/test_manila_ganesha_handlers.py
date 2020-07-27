@@ -47,12 +47,16 @@ class TestRegisteredHooks(test_utils.TestRegisteredHooks):
                                       'ganesha-pool-configured',
                                       'config.rendered',),
                 'enable_services_in_non_ha': ('config.rendered',),
+                'disable_services': ('cluster.connected',),
             },
             'when_not': {
-                'ceph_connected': ('ceph.available',),
+                'ceph_connected': ('ganesha-pool-configured',),
                 'configure_ident_username': ('identity-service.available',),
                 'configure_ganesha': ('ganesha-pool-configured',),
-                'enable_services_in_non_ha': ('ha.connected',),
+                'enable_services_in_non_ha': ('cluster.connected',),
+                'cluster_connected': ('ha-resources-exposed',),
+                'disable_services': ('ha.available',
+                                     'ha-resources-exposed',),
             },
             'when_all': {
                 'configure_ganesha': ('config.rendered',

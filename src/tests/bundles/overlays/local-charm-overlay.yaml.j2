@@ -1,0 +1,15 @@
+# Add True HA
+applications:
+  manila-ganesha-az1:
+    options:
+      vip: '{{ OS_VIP00 }}'
+      debug: True
+  hacluster:
+    charm: cs:~openstack-charmers-next/hacluster
+    num_units: 0
+  manila:
+    options:
+      debug: True
+relations:
+- - manila-ganesha-az1
+  - hacluster

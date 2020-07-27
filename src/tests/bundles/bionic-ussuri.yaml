@@ -2,8 +2,8 @@ series: bionic
 options:
   source: &source cloud:bionic-ussuri
 services:
-  manila-ganesha:
-    num_units: 1
+  manila-ganesha-az1:
+    num_units: 3
     series: bionic
     charm: ../../../manila-ganesha
     options:
@@ -98,15 +98,15 @@ relations:
   - - ceph-mon
     - ceph-fs
   - - ceph-mon
-    - manila-ganesha
-  - - manila-ganesha
+    - manila-ganesha-az1
+  - - manila-ganesha-az1
     - percona-cluster
-  - - manila-ganesha
+  - - manila-ganesha-az1
     - rabbitmq-server
-  - - manila-ganesha
+  - - manila-ganesha-az1
     - keystone
   - - manila
-    - manila-ganesha
+    - manila-ganesha-az1
   - - manila
     - rabbitmq-server
   - - manila

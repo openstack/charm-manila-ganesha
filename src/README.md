@@ -29,6 +29,20 @@ Service][cdg-appendix-q] in the OpenStack [Charms Deployment Guide][cdg] to see
 what such an overlay may look like as well as for more general information on
 using Manila Ganesha with charmed OpenStack.
 
+## High Availability ##
+
+This charm supports active/passive HA when deployed in a cluster with the
+hacluster charm. This is done by co-locating manila-share and nfs-ganesha
+systemd services on the same unit, and ensuring that those services are
+running only on the master unit with the VIP. Once an HA deployment is
+complete, pacemaker will ensure that only one unit is running the services.
+
+If a second unit starts the services while the first is connected to CephFS,
+the first will be evicted and its session state corrupted.
+
+Any restarts of manila-ganesha services that aren't controlled by the
+charm or pacemaker can result in evicted sessions.
+
 ## Bugs
 
 Please report bugs on [Launchpad][lp-bugs-charm-manila-ganesha].

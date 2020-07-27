@@ -25,14 +25,15 @@ machines:
   '13':
   '14':
   '15':
-    constraints: mem=8G
   '16':
     constraints: mem=8G
   '17':
+    constraints: mem=8G
   '18':
   '19':
   '20':
   '21':
+  '22':
 
 services:
 
@@ -61,13 +62,15 @@ services:
       - '1'
       - '2'
 
-  manila-ganesha:
-    num_units: 1
+  manila-ganesha-az1:
+    num_units: 3
     charm: ../../../manila-ganesha
     options:
       openstack-origin: *openstack-origin
     to:
       - '3'
+      - '4'
+      - '5'
 
   ceph-mon:
     charm: cs:~openstack-charmers-next/ceph-mon
@@ -75,9 +78,8 @@ services:
     options:
       source: *openstack-origin
     to:
-      - '4'
-      - '5'
       - '6'
+      - '7'
 
   ceph-osd:
     charm: cs:~openstack-charmers-next/ceph-osd
@@ -87,9 +89,9 @@ services:
     storage:
       osd-devices: 'cinder,10G'
     to:
-      - '7'
       - '8'
       - '9'
+      - '10'
 
   ceph-fs:
     charm: cs:~openstack-charmers-next/ceph-fs
@@ -97,8 +99,8 @@ services:
     options:
       source: *openstack-origin
     to:
-      - '10'
       - '11'
+      - '12'
 
   manila:
     charm: cs:~openstack-charmers-next/manila
@@ -108,7 +110,7 @@ services:
       share-protocols: NFS
       openstack-origin: *openstack-origin
     to:
-      - '12'
+      - '13'
 
   nova-cloud-controller:
     charm: cs:~openstack-charmers-next/nova-cloud-controller
@@ -117,7 +119,7 @@ services:
       network-manager: Neutron
       openstack-origin: *openstack-origin
     to:
-      - '13'
+      - '14'
 
   placement:
     charm: cs:~openstack-charmers-next/placement
@@ -125,7 +127,7 @@ services:
     options:
       openstack-origin: *openstack-origin
     to:
-      - '14'
+      - '15'
 
   nova-compute:
     charm: cs:~openstack-charmers-next/nova-compute
@@ -137,8 +139,8 @@ services:
       migration-auth-type: ssh
       openstack-origin: *openstack-origin
     to:
-      - '15'
       - '16'
+      - '17'
 
   glance:
     charm: cs:~openstack-charmers-next/glance
@@ -146,7 +148,7 @@ services:
     options:
       openstack-origin: *openstack-origin
     to:
-      - '17'
+      - '18'
 
   neutron-api:
     charm: cs:~openstack-charmers-next/neutron-api
@@ -158,7 +160,7 @@ services:
       neutron-security-groups: true
       openstack-origin: *openstack-origin
     to:
-      - '18'
+      - '19'
 
   neutron-openvswitch:
     charm: cs:~openstack-charmers-next/neutron-openvswitch
@@ -170,7 +172,7 @@ services:
       bridge-mappings: physnet1:br-ex
       openstack-origin: *openstack-origin
     to:
-      - '19'
+      - '20'
 
   rabbitmq-server:
     charm: cs:~openstack-charmers-next/rabbitmq-server
@@ -178,7 +180,7 @@ services:
     options:
       source: *openstack-origin
     to:
-      - '20'
+      - '21'
 
   keystone:
     charm: cs:~openstack-charmers-next/keystone
@@ -186,7 +188,7 @@ services:
     options:
       openstack-origin: *openstack-origin
     to:
-      - '21'
+      - '22'
 
 relations:
 
@@ -197,23 +199,23 @@ relations:
     - 'ceph-fs'
 
   - - 'ceph-mon'
-    - 'manila-ganesha'
+    - 'manila-ganesha-az1'
 
   - - 'manila:shared-db'
     - 'manila-mysql-router:shared-db'
   - - 'manila-mysql-router:db-router'
     - 'mysql-innodb-cluster:db-router'
 
-  - - 'manila-ganesha'
+  - - 'manila-ganesha-az1'
     - 'rabbitmq-server'
 
-  - - 'manila-ganesha'
+  - - 'manila-ganesha-az1'
     - 'keystone'
 
   - - 'manila'
-    - 'manila-ganesha'
+    - 'manila-ganesha-az1'
 
-  - - 'manila-ganesha:shared-db'
+  - - 'manila-ganesha-az1:shared-db'
     - 'manila-ganesha-mysql-router:shared-db'
   - - 'manila-ganesha-mysql-router:db-router'
     - 'mysql-innodb-cluster:db-router'

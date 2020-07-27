@@ -61,7 +61,7 @@ services:
       - '1'
       - '2'
 
-  manila-ganesha:
+  manila-ganesha-az1:
     num_units: 1
     charm: ../../../manila-ganesha
     options:
@@ -197,23 +197,23 @@ relations:
     - 'ceph-fs'
 
   - - 'ceph-mon'
-    - 'manila-ganesha'
+    - 'manila-ganesha-az1'
 
   - - 'manila:shared-db'
     - 'manila-mysql-router:shared-db'
   - - 'manila-mysql-router:db-router'
     - 'mysql-innodb-cluster:db-router'
 
-  - - 'manila-ganesha'
+  - - 'manila-ganesha-az1'
     - 'rabbitmq-server'
 
-  - - 'manila-ganesha'
+  - - 'manila-ganesha-az1'
     - 'keystone'
 
   - - 'manila'
-    - 'manila-ganesha'
+    - 'manila-ganesha-az1'
 
-  - - 'manila-ganesha:shared-db'
+  - - 'manila-ganesha-az1:shared-db'
     - 'manila-ganesha-mysql-router:shared-db'
   - - 'manila-ganesha-mysql-router:db-router'
     - 'mysql-innodb-cluster:db-router'
