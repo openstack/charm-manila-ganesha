@@ -3,7 +3,7 @@ options:
   source: &source cloud:bionic-train
 services:
   manila-ganesha:
-    num_units: 3
+    num_units: 1
     series: bionic
     charm: ../../../manila-ganesha
     options:
