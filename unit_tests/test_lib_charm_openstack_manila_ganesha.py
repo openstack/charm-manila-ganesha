@@ -29,13 +29,11 @@ class Helper(test_utils.PatchHelper):
 class TestManilaGaneshaCharm(Helper):
 
     def test_request_ceph_permissions(self):
-        self.patch_object(manila_ganesha, 'send_request_if_needed')
         c = manila_ganesha.ManilaGaneshaCharm()
         ceph = mock.MagicMock()
-        ceph.get_local.return_value = None
+        ceph.get_current_request.return_value = None
         c.request_ceph_permissions(ceph)
-        ceph.set_local.assert_called_once()
-        self.send_request_if_needed.assert_called_once()
+        ceph.send_request_if_needed.assert_called_once()
 
     def test_access_ip_without_vip(self):
         self.patch_object(manila_ganesha, 'is_clustered')

@@ -72,7 +72,7 @@ def render_things(*args):
                             'keyring'.format(ceph_relation.relation_name),
                             level=ch_core.hookenv.INFO)
 
-        charm_instance.configure_ceph_keyring(ceph_relation.key())
+        charm_instance.configure_ceph_keyring(ceph_relation.key)
         charm_instance.render_with_interfaces(args)
         for service in charm_instance.services:
             ch_core.host.service('enable', service)

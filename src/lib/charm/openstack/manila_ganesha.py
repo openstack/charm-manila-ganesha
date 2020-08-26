@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import collections
-import json
 
 # import charms.reactive as reactive
 
@@ -23,12 +22,10 @@ import charms_openstack.plugins
 import charmhelpers.contrib.network.ip as ch_net_ip
 from charmhelpers.core.hookenv import (
     config,
-    log,
 )
 from charmhelpers.contrib.hahelpers.cluster import is_clustered
 from charmhelpers.contrib.storage.linux.ceph import (
     CephBrokerRq,
-    send_request_if_needed,
 )
 # import charmhelpers.core as ch_core
 
@@ -230,20 +227,8 @@ class ManilaGaneshaCharm(charms_openstack.charm.HAOpenStackCharm,
         ]
 
     def request_ceph_permissions(self, ceph):
-        rq = CephBrokerRq()
-
-        json_rq = ceph.get_local(key='broker_req')
-        if json_rq:
-            try:
-                j = json.loads(json_rq)
-                log("Json request: {}".format(json_rq))
-                rq.set_ops(j['ops'])
-            except ValueError as err:
-                log("Unable to decode broker_req: {}. Error {}".format(
-                    json_rq, err))
-
+        rq = ceph.get_current_request() or CephBrokerRq()
         rq.add_op({'op': 'set-key-permissions',
                    'permissions': CEPH_CAPABILITIES,
                    'client': 'manila-ganesha'})
-        ceph.set_local(key='broker_req', value=rq.request)
-        send_request_if_needed(rq, relation='ceph')
+        ceph.send_request_if_needed(rq)
