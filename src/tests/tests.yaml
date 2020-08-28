@@ -1,7 +1,6 @@
 charm_name: manila-ganesha
 dev_bundles:
 - bionic
-- focal-victoria
 - groovy-victoria
 gate_bundles:
 - bionic-rocky
@@ -9,6 +8,7 @@ gate_bundles:
 - bionic-train
 - bionic-ussuri
 - focal-ussuri
+- focal-victoria
 smoke_bundles:
 - bionic-train
 target_deploy_status: {}
