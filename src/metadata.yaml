@@ -11,8 +11,6 @@ tags:
 - file-servers
 series:
 - bionic
-- disco
-- eoan
 - focal
 - groovy
 subordinate: false
