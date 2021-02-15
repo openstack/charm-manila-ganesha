@@ -1,0 +1,13 @@
+- project:
+    templates:
+      - charm-unit-jobs
+    check:
+      jobs:
+      - bionic-stein
+      - bionic-train
+      - bionic-ussuri
+      - focal-ussuri
+      - focal-victoria
+    vars:
+      needs_charm_build: true
+      charm_build_name: manila-ganesha
