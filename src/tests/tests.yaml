@@ -1,9 +1,9 @@
 charm_name: manila-ganesha
 dev_bundles:
 - bionic
+- bionic-rocky
 - groovy-victoria
 gate_bundles:
-- bionic-rocky
 - bionic-stein
 - bionic-train
 - bionic-ussuri
