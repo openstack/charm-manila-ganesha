@@ -55,8 +55,7 @@ class TestRegisteredHooks(test_utils.TestRegisteredHooks):
                 'configure_ganesha': ('ganesha-pool-configured',),
                 'enable_services_in_non_ha': ('cluster.connected',),
                 'cluster_connected': ('ha-resources-exposed',),
-                'disable_services': ('ha.available',
-                                     'ha-resources-exposed',),
+                'disable_services': ('services-disabled',),
             },
             'when_all': {
                 'configure_ganesha': ('config.rendered',

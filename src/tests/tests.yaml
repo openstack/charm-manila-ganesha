@@ -1,16 +1,13 @@
 charm_name: manila-ganesha
 dev_bundles:
-- bionic
-- bionic-rocky
 - groovy-victoria
 gate_bundles:
-- bionic-stein
-- bionic-train
-- bionic-ussuri
 - focal-ussuri
 - focal-victoria
+- focal-wallaby
+- groovy-victoria
 smoke_bundles:
-- bionic-train
+- focal-ussuri
 target_deploy_status: {}
 tests:
   - zaza.openstack.charm_tests.manila_ganesha.tests.ManilaGaneshaTests

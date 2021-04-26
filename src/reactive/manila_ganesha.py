@@ -135,7 +135,7 @@ def cluster_connected(hacluster):
 
 
 @reactive.when('cluster.connected')
-@reactive.when_not('ha.available', 'ha-resources-exposed')
+@reactive.when_not('services-disabled')
 def disable_services():
     """Ensure systemd units remain disabled/stopped until HA setup is complete
 
@@ -148,3 +148,7 @@ def disable_services():
     for service in ['nfs-ganesha', 'manila-share']:
         ch_core.host.service('disable', service)
         ch_core.host.service('stop', service)
+    # We have to unmask this service here in case it was masked early
+    # based on the expectation of multiple units via goal-state
+    ch_core.host.service('unmask', 'manila-share')
+    reactive.set_flag('services-disabled')
