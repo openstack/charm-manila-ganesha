@@ -14,6 +14,7 @@ series:
 - focal
 - groovy
 - hirsute
+- impish
 subordinate: false
 extra-bindings:
   tenant-storage:
