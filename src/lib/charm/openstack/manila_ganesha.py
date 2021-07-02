@@ -21,9 +21,14 @@ import charms_openstack.charm
 import charms_openstack.adapters
 import charms_openstack.plugins
 import charmhelpers.contrib.network.ip as ch_net_ip
-from charmhelpers.core.host import cmp_pkgrevno
+from charmhelpers.core.host import (
+    cmp_pkgrevno,
+    service_pause,
+)
 from charmhelpers.core.hookenv import (
     config,
+    goal_state,
+    local_unit,
     log,
 )
 from charmhelpers.contrib.hahelpers.cluster import (
@@ -41,6 +46,7 @@ MANILA_CONF = MANILA_DIR + "manila.conf"
 MANILA_LOGGING_CONF = MANILA_DIR + "logging.conf"
 MANILA_API_PASTE_CONF = MANILA_DIR + "api-paste.ini"
 CEPH_CONF = '/etc/ceph/ceph.conf'
+GANESHA_CONF = '/etc/ganesha/ganesha.conf'
 
 CEPH_CAPABILITIES = [
     "mds", "allow *",
@@ -68,6 +74,11 @@ def access_ip(config):
     :returns list of lines: the config for the manila.conf file
     """
     return config.charm_instance.access_ip
+
+
+@charms_openstack.adapters.config_property
+def recovery_backend(config):
+    return config.charm_instance.recovery_backend
 
 
 @charms_openstack.adapters.config_property
@@ -205,6 +216,7 @@ class ManilaGaneshaCharm(charms_openstack.charm.HAOpenStackCharm,
     @property
     def restart_map(self):
         return {
+            GANESHA_CONF: ['nfs-ganesha'],
             MANILA_CONF: ['manila-share', 'nfs-ganesha'],
             MANILA_API_PASTE_CONF: ['manila-share', 'nfs-ganesha'],
             MANILA_LOGGING_CONF: ['manila-share', 'nfs-ganesha'],
@@ -227,6 +239,21 @@ class ManilaGaneshaCharm(charms_openstack.charm.HAOpenStackCharm,
     def _crm_no_such_resource_code():
         return (errno.ENXIO if cmp_pkgrevno('pacemaker', '2.0.0') < 0
                 else CRM_EX_NOSUCH)
+
+    def install(self):
+        """Install packages related to this charm based on
+        contents of self.packages attribute, after first
+        configuring the installation source.
+        """
+        # Use goal-state to determine if we are expecting multiple units
+        # and, if so, mask the manila-share service so that it only ever
+        # gets run by pacemaker.
+        _goal_state = goal_state()
+        peers = (key for key in _goal_state['units']
+                 if '/' in key and key != local_unit())
+        if len(list(peers)) > 0:
+            service_pause('manila-share')
+        super().install()
 
     def service_restart(self, service_name):
         res_name = self.service_to_resource_map.get(service_name, None)
@@ -330,6 +357,10 @@ class ManilaGaneshaCharm(charms_openstack.charm.HAOpenStackCharm,
                     return vip
         return net_addr
 
+    @property
+    def recovery_backend(self):
+        return 'fs'
+
     def enable_memcache(self, *args, **kwargs):
         return False
 
@@ -367,3 +398,12 @@ class ManilaGaneshaCharm(charms_openstack.charm.HAOpenStackCharm,
                    'permissions': CEPH_CAPABILITIES,
                    'client': ch_core.hookenv.application_name()})
         ceph.send_request_if_needed(rq)
+
+
+class ManilaGaneshaUssuriCharm(ManilaGaneshaCharm,
+                               ):
+    release = 'ussuri'
+
+    @property
+    def recovery_backend(self):
+        return 'rados_ng'
