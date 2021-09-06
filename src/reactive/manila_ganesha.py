@@ -76,13 +76,17 @@ def render_things(*args):
         charm_instance.assess_status()
 
 
-@reactive.when('config.rendered')
-@reactive.when_not('cluster.connected')
+@reactive.when('config.rendered',
+               'ganesha-pool-configured')
+@reactive.when_not('cluster.connected',
+                   'services-started')
 def enable_services_in_non_ha():
     with charm.provide_charm_instance() as charm_instance:
-        for service in charm_instance.services:
+        for service in charm_instance.service_to_resource_map.keys():
             ch_core.host.service('enable', service)
+            ch_core.host.service('stop', service)
             ch_core.host.service('start', service)
+        reactive.set_flag('services-started')
 
 
 @reactive.when_all('config.rendered',
@@ -119,7 +123,7 @@ def cluster_connected(hacluster):
         # once
         # https://bugs.launchpad.net/charm-interface-hacluster/+bug/1880644
         # is resolved
-        import hooks.relations.hacluster.common as hacluster_common  # noqa
+        import relations.hacluster.interface_hacluster.common as hacluster_common  # noqa
         crm = hacluster_common.CRM()
         crm.colocation('ganesha_with_vip',
                        'inf',

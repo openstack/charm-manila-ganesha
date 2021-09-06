@@ -5,6 +5,7 @@
       jobs:
       - bionic-ussuri
       - focal-ussuri
+      - ganesha-focal-ussuri-non-ha
       - focal-victoria
       # Wallaby is currently broken because of a change in the
       # default token-type requirements in manila's policy.json
@@ -21,3 +22,10 @@
     vars:
       needs_charm_build: true
       charm_build_name: manila-ganesha
+- job:
+    name: ganesha-focal-ussuri-non-ha
+    parent: bionic-ussuri
+    dependencies:
+      - bionic-ussuri
+    vars:
+      tox_extra_args: focal-ussuri-non-ha
