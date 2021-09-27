@@ -1,6 +1,10 @@
 charm_name: manila-ganesha
 dev_bundles:
+- focal-wallaby
+- focal-xena
 - groovy-victoria
+- hirsute-wallaby
+- impish-xena
 gate_bundles:
 - focal-ussuri
 - focal-victoria
@@ -21,3 +25,4 @@ configure:
 tests_options:
   force_deploy:
     - groovy-victoria
+    - impish-xena
