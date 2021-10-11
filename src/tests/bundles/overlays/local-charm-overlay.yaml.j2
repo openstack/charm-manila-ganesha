@@ -5,8 +5,9 @@ applications:
       vip: '{{ OS_VIP00 }}'
       debug: True
   hacluster:
-    charm: cs:~openstack-charmers-next/hacluster
+    charm: cs:~openstack-charmers/hacluster
     num_units: 0
+    channel: candidate
   manila:
     options:
       debug: True
