@@ -26,14 +26,15 @@ machines:
   '12':
   '13':
   '14':
-    constraints: mem=8G
   '15':
     constraints: mem=8G
   '16':
+    constraints: mem=8G
   '17':
   '18':
   '19':
   '20':
+  '21':
 
 services:
 
@@ -78,6 +79,7 @@ services:
     to:
       - '4'
       - '5'
+      - '6'
 
   ceph-osd:
     charm: cs:~openstack-charmers-next/ceph-osd
@@ -87,9 +89,9 @@ services:
     storage:
       osd-devices: 'cinder,10G'
     to:
-      - '6'
       - '7'
       - '8'
+      - '9'
 
   ceph-fs:
     charm: cs:~openstack-charmers-next/ceph-fs
@@ -97,8 +99,8 @@ services:
     options:
       source: *openstack-origin
     to:
-      - '9'
       - '10'
+      - '11'
 
   manila:
     charm: cs:~openstack-charmers-next/manila
@@ -108,7 +110,7 @@ services:
       share-protocols: NFS
       openstack-origin: *openstack-origin
     to:
-      - '11'
+      - '12'
 
   nova-cloud-controller:
     charm: cs:~openstack-charmers-next/nova-cloud-controller
@@ -117,7 +119,7 @@ services:
       network-manager: Neutron
       openstack-origin: *openstack-origin
     to:
-      - '12'
+      - '13'
 
   placement:
     charm: cs:~openstack-charmers-next/placement
@@ -125,7 +127,7 @@ services:
     options:
       openstack-origin: *openstack-origin
     to:
-      - '13'
+      - '14'
 
   nova-compute:
     charm: cs:~openstack-charmers-next/nova-compute
@@ -137,8 +139,8 @@ services:
       migration-auth-type: ssh
       openstack-origin: *openstack-origin
     to:
-      - '14'
       - '15'
+      - '16'
 
   glance:
     charm: cs:~openstack-charmers-next/glance
@@ -146,7 +148,7 @@ services:
     options:
       openstack-origin: *openstack-origin
     to:
-      - '16'
+      - '17'
 
   neutron-api:
     charm: cs:~openstack-charmers-next/neutron-api
@@ -158,7 +160,7 @@ services:
       neutron-security-groups: true
       openstack-origin: *openstack-origin
     to:
-      - '17'
+      - '18'
 
   neutron-openvswitch:
     charm: cs:~openstack-charmers-next/neutron-openvswitch
@@ -170,7 +172,7 @@ services:
       bridge-mappings: physnet1:br-ex
       openstack-origin: *openstack-origin
     to:
-      - '18'
+      - '19'
 
   rabbitmq-server:
     charm: cs:~openstack-charmers-next/rabbitmq-server
@@ -178,7 +180,7 @@ services:
     options:
       source: *openstack-origin
     to:
-      - '19'
+      - '20'
 
   keystone:
     charm: cs:~openstack-charmers-next/keystone
@@ -186,7 +188,7 @@ services:
     options:
       openstack-origin: *openstack-origin
     to:
-      - '20'
+      - '21'
 
 relations:
 

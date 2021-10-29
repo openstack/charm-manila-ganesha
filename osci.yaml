@@ -1,20 +1,39 @@
 - project:
     templates:
-      - charm-unit-jobs
+      - charm-yoga-unit-jobs
+      - charm-yoga-functional-jobs
+      # Non-voting due to:
+      # https://bugs.launchpad.net/charm-manila-ganesha/+bug/1952763
+      # - charm-xena-functional-jobs
+      # - charm-wallaby-functional-jobs
+      # Non-voting due to:
+      # https://bugs.launchpad.net/charm-manila-ganesha/+bug/1935022
+      # - charm-victoria-functional-jobs
+      # - charm-ussuri-functional-jobs
+      # Non-voting due to:
+      # https://bugs.launchpad.net/charm-manila-ganesha/+bug/1952798
+      # - charm-stein-functional-jobs
     check:
       jobs:
       - bionic-ussuri
-      - focal-ussuri
-      - ganesha-focal-ussuri-non-ha
-      - focal-victoria
-      # Wallaby is currently broken because of a change in the
-      # default token-type requirements in manila's policy.json
-      # that the charm / tests need to learn to handle
+      # Non-voting due to:
+      # https://bugs.launchpad.net/charm-manila-ganesha/+bug/1952798
+      - bionic-stein:
+          voting: false
+      # Non-voting due to:
+      # https://bugs.launchpad.net/charm-manila-ganesha/+bug/1935022
+      - focal-ussuri:
+          voting: false
+      - ganesha-focal-ussuri-non-ha:
+          voting: false
+      - focal-victoria:
+          voting: false
+      # Non-voting due to:
+      # https://bugs.launchpad.net/charm-manila-ganesha/+bug/1952763
       - focal-wallaby:
           voting: false
       - focal-xena:
           voting: false
-      - groovy-victoria
       - hirsute-wallaby:
           voting: false
       - impish-xena:
@@ -24,8 +43,8 @@
       charm_build_name: manila-ganesha
 - job:
     name: ganesha-focal-ussuri-non-ha
-    parent: bionic-ussuri
+    parent: focal-ussuri
     dependencies:
-      - bionic-ussuri
+      - focal-ussuri
     vars:
       tox_extra_args: focal-ussuri-non-ha

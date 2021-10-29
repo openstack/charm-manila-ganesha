@@ -1,15 +1,14 @@
 charm_name: manila-ganesha
-dev_bundles:
-- focal-wallaby
-- focal-xena
-- groovy-victoria
-- hirsute-wallaby
-- impish-xena
 gate_bundles:
 - focal-ussuri
 - focal-victoria
 - focal-wallaby
-- groovy-victoria
+- focal-xena
+- hirsute-wallaby
+- impish-xena
+dev_bundles:
+- focal-yoga
+- jammy-yoga
 smoke_bundles:
 - focal-ussuri
 target_deploy_status: {}
@@ -24,5 +23,6 @@ configure:
   - zaza.openstack.charm_tests.manila_ganesha.setup.setup_ganesha_share_type
 tests_options:
   force_deploy:
-    - groovy-victoria
+    - hirsute-wallaby
     - impish-xena
+    - jammy-yoga
