@@ -1,50 +1,20 @@
 - project:
     templates:
-      - charm-yoga-unit-jobs
+      - charm-unit-jobs-py38
+      - charm-unit-jobs-py39
       - charm-yoga-functional-jobs
       # Non-voting due to:
       # https://bugs.launchpad.net/charm-manila-ganesha/+bug/1952763
       # - charm-xena-functional-jobs
       # - charm-wallaby-functional-jobs
-      # Non-voting due to:
-      # https://bugs.launchpad.net/charm-manila-ganesha/+bug/1935022
-      # - charm-victoria-functional-jobs
-      # - charm-ussuri-functional-jobs
-      # Non-voting due to:
-      # https://bugs.launchpad.net/charm-manila-ganesha/+bug/1952798
-      # - charm-stein-functional-jobs
     check:
       jobs:
-      - bionic-ussuri
-      # Non-voting due to:
-      # https://bugs.launchpad.net/charm-manila-ganesha/+bug/1952798
-      - bionic-stein:
-          voting: false
-      # Non-voting due to:
-      # https://bugs.launchpad.net/charm-manila-ganesha/+bug/1935022
-      - focal-ussuri:
-          voting: false
-      - ganesha-focal-ussuri-non-ha:
-          voting: false
-      - focal-victoria:
-          voting: false
       # Non-voting due to:
       # https://bugs.launchpad.net/charm-manila-ganesha/+bug/1952763
-      - focal-wallaby:
-          voting: false
       - focal-xena:
-          voting: false
-      - hirsute-wallaby:
           voting: false
       - impish-xena:
           voting: false
     vars:
       needs_charm_build: true
       charm_build_name: manila-ganesha
-- job:
-    name: ganesha-focal-ussuri-non-ha
-    parent: focal-ussuri
-    dependencies:
-      - focal-ussuri
-    vars:
-      tox_extra_args: focal-ussuri-non-ha
