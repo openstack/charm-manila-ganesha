@@ -3,18 +3,9 @@
       - charm-unit-jobs-py38
       - charm-unit-jobs-py39
       - charm-yoga-functional-jobs
-      # Non-voting due to:
-      # https://bugs.launchpad.net/charm-manila-ganesha/+bug/1952763
-      # - charm-xena-functional-jobs
-      # - charm-wallaby-functional-jobs
-    check:
-      jobs:
-      # Non-voting due to:
-      # https://bugs.launchpad.net/charm-manila-ganesha/+bug/1952763
-      - focal-xena:
-          voting: false
-      - impish-xena:
-          voting: false
+      - charm-xena-functional-jobs
+      - charm-yoga-functional-jobs
     vars:
       needs_charm_build: true
       charm_build_name: manila-ganesha
+      build_type: charmcraft
