@@ -117,23 +117,13 @@ def cluster_connected(hacluster):
         hacluster.add_systemd_service('manila-share',
                                       'manila-share',
                                       clone=False)
+        hacluster.add_colocation('ganesha_with_vip', 'inf',
+                                 ('res_nfs_ganesha_nfs_ganesha',
+                                  'grp_ganesha_vips'))
+        hacluster.add_colocation('manila_with_vip', 'inf',
+                                 ('res_manila_share_manila_share',
+                                  'grp_ganesha_vips'))
         this_charm.configure_ha_resources(hacluster)
-        # This is a bit of a nasty hack to ensure that we can colocate the
-        # services to make manila + ganesha colocate. This can be tidied up
-        # once
-        # https://bugs.launchpad.net/charm-interface-hacluster/+bug/1880644
-        # is resolved
-        import relations.hacluster.interface_hacluster.common as hacluster_common  # noqa
-        crm = hacluster_common.CRM()
-        crm.colocation('ganesha_with_vip',
-                       'inf',
-                       'res_nfs_ganesha_nfs_ganesha',
-                       'grp_ganesha_vips')
-        crm.colocation('manila_with_vip',
-                       'inf',
-                       'res_manila_share_manila_share',
-                       'grp_ganesha_vips')
-        hacluster.manage_resources(crm)
         reactive.set_flag('ha-resources-exposed')
         this_charm.assess_status()
 
