@@ -50,6 +50,7 @@ GANESHA_CONF = '/etc/ganesha/ganesha.conf'
 
 CEPH_CAPABILITIES = [
     "mds", "allow *",
+    "mgr", "allow *",
     "osd", "allow rw",
     "mon", "allow r, "
     "allow command \"auth del\", "
