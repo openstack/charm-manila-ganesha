@@ -1,24 +1,11 @@
 - project:
     templates:
-      - charm-unit-jobs
+      - charm-unit-jobs-py38
     check:
       jobs:
-      - bionic-ussuri
-      - focal-ussuri
-      - ganesha-focal-ussuri-non-ha
-      - focal-victoria
-      # Wallaby is currently broken because of a change in the
-      # default token-type requirements in manila's policy.json
-      # that the charm / tests need to learn to handle
-      # - focal-wallaby
-      - groovy-victoria
+      - focal-xena
+      - focal-wallaby
     vars:
       needs_charm_build: true
       charm_build_name: manila-ganesha
-- job:
-    name: ganesha-focal-ussuri-non-ha
-    parent: bionic-ussuri
-    dependencies:
-      - bionic-ussuri
-    vars:
-      tox_extra_args: focal-ussuri-non-ha
+      build_type: charmcraft

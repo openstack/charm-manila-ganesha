@@ -4,4 +4,4 @@ port=29418
 project=openstack/charm-manila-ganesha.git
 
 
-defaultbranch=stable/21.10
+defaultbranch=stable/xena

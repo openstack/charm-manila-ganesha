@@ -1,7 +1,9 @@
-variables:
-  openstack-origin: &openstack-origin distro
+local_overlay_enabled: True
 
-series: hirsute
+variables:
+  openstack-origin: &openstack-origin cloud:focal-xena
+
+series: focal
 
 comment:
 - 'machines section to decide order of deployment. database sooner = faster'
@@ -26,42 +28,41 @@ machines:
   '14':
   '15':
   '16':
+    constraints: mem=8G
   '17':
     constraints: mem=8G
   '18':
-    constraints: mem=8G
   '19':
   '20':
   '21':
   '22':
-  '23':
 
 services:
 
   manila-mysql-router:
-    charm: cs:~openstack-charmers/mysql-router
-    channel: candidate
+    charm: ch:mysql-router
+    channel: 8.0.19/edge
   manila-ganesha-mysql-router:
-    charm: cs:~openstack-charmers/mysql-router
-    channel: candidate
+    charm: ch:mysql-router
+    channel: 8.0.19/edge
   keystone-mysql-router:
-    charm: cs:~openstack-charmers/mysql-router
-    channel: candidate
+    charm: ch:mysql-router
+    channel: 8.0.19/edge
   neutron-api-mysql-router:
-    charm: cs:~openstack-charmers/mysql-router
-    channel: candidate
+    charm: ch:mysql-router
+    channel: 8.0.19/edge
   nova-cloud-controller-mysql-router:
-    charm: cs:~openstack-charmers/mysql-router
-    channel: candidate
+    charm: ch:mysql-router
+    channel: 8.0.19/edge
   glance-mysql-router:
-    charm: cs:~openstack-charmers/mysql-router
-    channel: candidate
+    charm: ch:mysql-router
+    channel: 8.0.19/edge
   placement-mysql-router:
-    charm: cs:~openstack-charmers/mysql-router
-    channel: candidate
+    charm: ch:mysql-router
+    channel: 8.0.19/edge
 
   mysql-innodb-cluster:
-    charm: cs:~openstack-charmers/mysql-innodb-cluster
+    charm: ch:mysql-innodb-cluster
     num_units: 3
     options:
       source: *openstack-origin
@@ -69,11 +70,11 @@ services:
       - '0'
       - '1'
       - '2'
-    channel: candidate
+    channel: 8.0.19/edge
 
   manila-ganesha-az1:
     num_units: 3
-    charm: ../../../manila-ganesha
+    charm: ../../../manila-ganesha.charm
     options:
       openstack-origin: *openstack-origin
     to:
@@ -82,71 +83,70 @@ services:
       - '5'
 
   ceph-mon:
-    charm: cs:~openstack-charmers/ceph-mon
+    charm: ch:ceph-mon
     num_units: 3
     options:
       source: *openstack-origin
     to:
       - '6'
       - '7'
-      - '8'
-    channel: candidate
+    channel: pacific/edge
 
   ceph-osd:
-    charm: cs:~openstack-charmers/ceph-osd
+    charm: ch:ceph-osd
     num_units: 3
     options:
       source: *openstack-origin
     storage:
       osd-devices: 'cinder,10G'
     to:
+      - '8'
       - '9'
       - '10'
-      - '11'
-    channel: candidate
+    channel: pacific/edge
 
   ceph-fs:
-    charm: cs:~openstack-charmers/ceph-fs
+    charm: ch:ceph-fs
     num_units: 2
     options:
       source: *openstack-origin
     to:
+      - '11'
       - '12'
-      - '13'
-    channel: candidate
+    channel: pacific/edge
 
   manila:
-    charm: cs:~openstack-charmers/manila
+    charm: ch:manila
     num_units: 1
     options:
       default-share-backend: cephfsnfs1
       share-protocols: NFS
       openstack-origin: *openstack-origin
     to:
-      - '14'
-    channel: candidate
+      - '13'
+    channel: xena/edge
 
   nova-cloud-controller:
-    charm: cs:~openstack-charmers/nova-cloud-controller
+    charm: ch:nova-cloud-controller
     num_units: 1
     options:
       network-manager: Neutron
       openstack-origin: *openstack-origin
     to:
-      - '15'
-    channel: candidate
+      - '14'
+    channel: xena/edge
 
   placement:
-    charm: cs:~openstack-charmers/placement
+    charm: ch:placement
     num_units: 1
     options:
       openstack-origin: *openstack-origin
     to:
-      - '16'
-    channel: candidate
+      - '15'
+    channel: xena/edge
 
   nova-compute:
-    charm: cs:~openstack-charmers/nova-compute
+    charm: ch:nova-compute
     num_units: 2
     options:
       config-flags: default_ephemeral_format=ext4
@@ -155,21 +155,21 @@ services:
       migration-auth-type: ssh
       openstack-origin: *openstack-origin
     to:
+      - '16'
       - '17'
-      - '18'
-    channel: candidate
+    channel: xena/edge
 
   glance:
-    charm: cs:~openstack-charmers/glance
+    charm: ch:glance
     num_units: 1
     options:
       openstack-origin: *openstack-origin
     to:
-      - '19'
-    channel: candidate
+      - '18'
+    channel: xena/edge
 
   neutron-api:
-    charm: cs:~openstack-charmers/neutron-api
+    charm: ch:neutron-api
     num_units: 1
     options:
       manage-neutron-plugin-legacy-mode: true
@@ -178,40 +178,40 @@ services:
       neutron-security-groups: true
       openstack-origin: *openstack-origin
     to:
-      - '20'
-    channel: candidate
+      - '19'
+    channel: xena/edge
 
   neutron-openvswitch:
-    charm: cs:~openstack-charmers/neutron-openvswitch
-    channel: candidate
+    charm: ch:neutron-openvswitch
+    channel: xena/edge
 
   neutron-gateway:
-    charm: cs:~openstack-charmers/neutron-gateway
+    charm: ch:neutron-gateway
     num_units: 1
     options:
       bridge-mappings: physnet1:br-ex
       openstack-origin: *openstack-origin
     to:
-      - '21'
-    channel: candidate
+      - '20'
+    channel: xena/edge
 
   rabbitmq-server:
-    charm: cs:~openstack-charmers/rabbitmq-server
+    charm: ch:rabbitmq-server
     num_units: 1
     options:
       source: *openstack-origin
     to:
-      - '22'
-    channel: candidate
+      - '21'
+    channel: 3.8/edge
 
   keystone:
-    charm: cs:~openstack-charmers/keystone
+    charm: ch:keystone
     num_units: 1
     options:
       openstack-origin: *openstack-origin
     to:
-      - '23'
-    channel: candidate
+      - '22'
+    channel: xena/edge
 
 relations:
 
