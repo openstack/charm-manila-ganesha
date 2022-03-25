@@ -11,7 +11,7 @@ tags:
 - file-servers
 series:
 - focal
-- impish
+- jammy
 subordinate: false
 extra-bindings:
   tenant-storage:
