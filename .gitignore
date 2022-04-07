@@ -3,4 +3,5 @@
 *__pycache__*
 *.pyc
 build
-.idea*.charm
+.idea
+*.charm
