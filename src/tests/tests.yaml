@@ -1,13 +1,10 @@
 charm_name: manila-ganesha
-dev_bundles:
-- groovy-victoria
+dev_bundles: []
 gate_bundles:
-- focal-ussuri
 - focal-victoria
 - focal-wallaby
-- groovy-victoria
 smoke_bundles:
-- focal-ussuri
+- focal-wallaby
 target_deploy_status: {}
 tests:
   - zaza.openstack.charm_tests.manila_ganesha.tests.ManilaGaneshaTests
@@ -19,5 +16,4 @@ configure:
   - zaza.openstack.charm_tests.keystone.setup.add_demo_user
   - zaza.openstack.charm_tests.manila_ganesha.setup.setup_ganesha_share_type
 tests_options:
-  force_deploy:
-    - groovy-victoria
+  force_deploy: []
