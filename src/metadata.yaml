@@ -10,8 +10,8 @@ tags:
 - storage
 - file-servers
 series:
-- focal
 - jammy
+- kinetic
 subordinate: false
 extra-bindings:
   tenant-storage:
