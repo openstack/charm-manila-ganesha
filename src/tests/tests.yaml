@@ -2,14 +2,13 @@ charm_name: manila-ganesha
 
 gate_bundles:
 - focal-xena
-- impish-xena
-
-dev_bundles:
 - focal-yoga
 - jammy-yoga
 
+dev_bundles: []
+
 smoke_bundles:
-- focal-xena
+- focal-yoga
 
 target_deploy_status: {}
 
@@ -26,5 +25,4 @@ configure:
 
 tests_options:
   force_deploy:
-    - impish-xena
     - jammy-yoga
