@@ -49,6 +49,7 @@ class TestRegisteredHooks(test_utils.TestRegisteredHooks):
                 'enable_services_in_non_ha': ('config.rendered',
                                               'ganesha-pool-configured',),
                 'disable_services': ('cluster.connected',),
+                'configure_nrpe': ('nrpe-external-master.available',),
             },
             'when_not': {
                 'ceph_connected': ('ganesha-pool-configured',),
@@ -58,11 +59,12 @@ class TestRegisteredHooks(test_utils.TestRegisteredHooks):
                                               'services-started',),
                 'cluster_connected': ('ha-resources-exposed',),
                 'disable_services': ('services-disabled',),
+                'remove_nrpe': ('nrpe-external-master.available',),
             },
             'when_all': {
                 'configure_ganesha': ('config.rendered',
                                       'ceph.pools.available',),
-            }
+            },
         }
         # test that the hooks were registered via the
         # reactive.manila_ganesha_handlers

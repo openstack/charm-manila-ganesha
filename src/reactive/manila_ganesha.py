@@ -9,7 +9,6 @@ import charms.reactive.relations as relations
 import charmhelpers.core as ch_core
 from charmhelpers.core.hookenv import log
 
-
 charms_openstack.bus.discover()
 
 # Use the charms.openstack defaults for common states and hooks
@@ -146,3 +145,19 @@ def disable_services():
     # based on the expectation of multiple units via goal-state
     ch_core.host.service('unmask', 'manila-share')
     reactive.set_flag('services-disabled')
+
+
+@reactive.when('nrpe-external-master.available')
+def configure_nrpe():
+    """Config and install NRPE plugins."""
+    with charm.provide_charm_instance() as this_charm:
+        this_charm.install_nrpe_plugins()
+        this_charm.install_nrpe_checks()
+
+
+@reactive.when_not('nrpe-external-master.available')
+def remove_nrpe():
+    """Remove installed NRPE plugins."""
+    with charm.provide_charm_instance() as this_charm:
+        this_charm.remove_nrpe_plugins()
+        this_charm.remove_nrpe_checks()

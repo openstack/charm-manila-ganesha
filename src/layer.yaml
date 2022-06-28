@@ -6,6 +6,7 @@ includes:
   - interface:rabbitmq
   - interface:keystone-credentials
   - interface:manila-plugin
+  - interface:nrpe-external-master
 options:
   basic:
     use_venv: True

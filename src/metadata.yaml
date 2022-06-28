@@ -18,6 +18,9 @@ extra-bindings:
 provides:
   manila-plugin:
     interface: manila-plugin
+  nrpe-external-master:
+    interface: nrpe-external-master
+    scope: container
 requires:
   ceph:
     interface: ceph-client

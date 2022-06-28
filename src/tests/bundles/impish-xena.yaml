@@ -215,6 +215,9 @@ services:
       - '23'
     channel: yoga/edge
 
+  nrpe:
+    charm: ch:nrpe
+
 relations:
 
   - - 'ceph-mon'
@@ -332,3 +335,6 @@ relations:
 
   - - 'nova-cloud-controller:quantum-network-service'
     - 'neutron-gateway:quantum-network-service'
+
+  - - 'manila-ganesha-az1:nrpe-external-master'
+    - 'nrpe:nrpe-external-master'

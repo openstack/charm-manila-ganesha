@@ -1,0 +1,67 @@
+#!/usr/bin/env python3
+
+# Copyright 2022 Canonical Ltd
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import sys
+import subprocess
+
+CHECK_CMD = "/usr/sbin/rpcinfo | awk '{print $5}' | sed '1,1d' | sort | uniq"
+
+SERVICE_STATUS = {
+    0: "OKAY",
+    1: "WARNING",
+    2: "CRITICAL",
+    3: "UNKNOWN",
+}
+
+def main():
+    # List of RPC processes used by NFS
+    missing_procs = set(["nfs", "mountd", "portmapper", "nlockmgr", "rquotad"])
+
+    exit_code = 0
+    message = ""
+    try:
+        # Run command.
+        output = subprocess.check_output(
+            CHECK_CMD,
+            stderr = subprocess.STDOUT,
+            shell = True,
+            executable = "/bin/bash"
+        ).decode().strip()
+        # Get a list of RPC processes.
+        procs = set(output.split("\n"))
+        # Get the missing processes
+        missing_procs -= procs
+        if len(missing_procs) > 0:
+            exit_code = 2
+            message = (
+                f"RPC processes "
+                f"{', '.join(missing_procs)} "
+                f"not running which are required by NFS."
+            )
+        else:
+            message = "All RPC prcesses needed by NFS are running."
+    except subprocess.CalledProcessError as e:
+        exit_code = e.returncode
+        message = e.stdout
+    except Exception as e:
+        exit_code = 3
+        message = e
+
+    print(f"NFS service {SERVICE_STATUS[exit_code]}: {message}")
+    sys.exit(exit_code)
+
+if __name__ == "__main__":
+    main()

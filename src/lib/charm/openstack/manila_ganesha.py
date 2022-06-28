@@ -40,6 +40,12 @@ from charmhelpers.contrib.storage.linux.ceph import (
 )
 import charmhelpers.core as ch_core
 
+from lib.nfs_ganesha_nrpe import (
+    install_nrpe_checks,
+    install_nrpe_plugins,
+    remove_nrpe_plugins,
+    remove_nrpe_checks,
+)
 
 MANILA_DIR = '/etc/manila/'
 MANILA_CONF = MANILA_DIR + "manila.conf"
@@ -404,6 +410,18 @@ class ManilaGaneshaCharm(charms_openstack.charm.HAOpenStackCharm,
                    'permissions': CEPH_CAPABILITIES,
                    'client': ch_core.hookenv.application_name()})
         ceph.send_request_if_needed(rq)
+
+    def install_nrpe_checks(self, enable_cron=True):
+        return install_nrpe_checks(enable_cron=enable_cron)
+
+    def remove_nrpe_checks(self):
+        remove_nrpe_checks()
+
+    def install_nrpe_plugins(self):
+        return install_nrpe_plugins()
+
+    def remove_nrpe_plugins(self):
+        remove_nrpe_plugins()
 
 
 class ManilaGaneshaUssuriCharm(ManilaGaneshaCharm,
