@@ -86,7 +86,7 @@
       "url": "https://github.com/openstack/charm-interface-hacluster.git",
       "vcs": null,
       "branch": "refs/heads/master",
-      "commit": "2b714e90b1b8845ce7390bb1dad5a56a65437907"
+      "commit": "5fc5216f51dcf98530d45e137d55fd94b39d150a"
     },
     {
       "type": "layer",
