@@ -2,7 +2,6 @@ charm_name: manila-ganesha
 dev_bundles: []
 gate_bundles:
   - focal-ussuri
-  - bioni-train
 smoke_bundles:
   - focal-ussuri
 target_deploy_status: {}
