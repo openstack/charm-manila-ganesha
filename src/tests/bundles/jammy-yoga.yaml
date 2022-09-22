@@ -75,7 +75,7 @@ services:
 
   manila-ganesha-az1:
     num_units: 3
-    charm: ../../../manila-ganesha.charm
+    charm: ../../../manila-ganesha_ubuntu-22.04-amd64_ubuntu-22.10-amd64.charm
     options:
       openstack-origin: *openstack-origin
     to:
