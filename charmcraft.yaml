@@ -22,8 +22,9 @@ parts:
       # hooks directory.
       cp -r $CRAFT_STAGE/* .
       # Charmcraft looks for this specific entry point.
-      mkdir src
-      ln -sf ../hooks/start src/charm.py
+      mkdir -p src
+      touch src/charm.py
+      chmod +x src/charm.py
 
 bases:
   - build-on:
