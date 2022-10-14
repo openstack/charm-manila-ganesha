@@ -3,3 +3,5 @@ host=review.opendev.org
 port=29418
 project=openstack/charm-manila-ganesha.git
 
+
+defaultbranch=stable/zed
