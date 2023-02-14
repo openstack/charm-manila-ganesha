@@ -1,5 +1,5 @@
 variables:
-  openstack-origin: &openstack-origin distro
+  openstack-origin: &openstack-origin cloud:jammy-antelope
 
 local_overlay_enabled: True
 
@@ -75,7 +75,7 @@ services:
 
   manila-ganesha-az1:
     num_units: 3
-    charm: ../../../manila-ganesha_ubuntu-22.04-amd64_ubuntu-22.10-amd64.charm
+    charm: ../../../manila-ganesha_ubuntu-22.04-amd64_ubuntu-22.10-amd64_ubuntu-23.04-amd64.charm
     options:
       openstack-origin: *openstack-origin
     to:
@@ -213,6 +213,10 @@ services:
       - '23'
     channel: latest/edge
 
+  nrpe:
+    charm: ch:nrpe
+    channel: latest/edge
+
 relations:
 
   - - 'ceph-mon'
@@ -330,3 +334,6 @@ relations:
 
   - - 'nova-cloud-controller:quantum-network-service'
     - 'neutron-gateway:quantum-network-service'
+
+  - - 'manila-ganesha-az1:nrpe-external-master'
+    - 'nrpe:nrpe-external-master'

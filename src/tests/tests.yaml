@@ -1,12 +1,12 @@
 charm_name: manila-ganesha
 
 gate_bundles:
-- jammy-yoga
+- jammy-zed
 
 dev_bundles:
-- jammy-yoga
-- jammy-zed
+- jammy-antelope
 - kinetic-zed
+- lunar-antelope
 
 smoke_bundles:
 - jammy-yoga
@@ -27,3 +27,4 @@ configure:
 tests_options:
   force_deploy:
     - kinetic-zed
+    - lunar-antelope
