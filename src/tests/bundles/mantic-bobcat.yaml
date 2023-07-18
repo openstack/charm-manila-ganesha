@@ -3,7 +3,7 @@ variables:
 
 local_overlay_enabled: True
 
-series: lunar
+series: mantic
 
 comment:
 - 'machines section to decide order of deployment. database sooner = faster'
@@ -75,7 +75,7 @@ services:
 
   manila-ganesha-az1:
     num_units: 3
-    charm: ../../../manila-ganesha_ubuntu-23.04-amd64.charm
+    charm: ../../../manila-ganesha_ubuntu-23.10-amd64.charm
     options:
       openstack-origin: *openstack-origin
     to:
