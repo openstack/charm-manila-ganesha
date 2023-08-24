@@ -18,3 +18,14 @@ config:
     - ssl_cert
     - ssl_key
     - verbose
+    - haproxy-server-timeout
+    - haproxy-client-timeout
+    - haproxy-queue-timeout
+    - haproxy-connect-timeout
+    - dns-ha
+    - os-admin-hostname
+    - os-admin-network
+    - os-internal-hostname
+    - os-internal-network
+    - os-public-hostname
+    - os-public-network
