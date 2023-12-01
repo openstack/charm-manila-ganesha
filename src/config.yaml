@@ -14,6 +14,10 @@ options:
       Note that updating this setting to a source that is known to
       provide a later version of OpenStack will trigger a software
       upgrade.
+  service-user:
+    default: manila
+    type: string
+    description: Username used for keystone's service credential.
   rabbit-user:
     default: manila
     type: string

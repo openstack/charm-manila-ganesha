@@ -49,6 +49,8 @@ class TestRegisteredHooks(test_utils.TestRegisteredHooks):
                 'enable_services_in_non_ha': ('config.rendered',
                                               'ganesha-pool-configured',),
                 'disable_services': ('cluster.connected',),
+                'update_ident_username': ('config.changed.service-user',
+                                          'identity-service.connected',),
             },
             'when_not': {
                 'ceph_connected': ('ganesha-pool-configured',),
