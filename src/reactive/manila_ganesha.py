@@ -7,7 +7,10 @@ import charms_openstack.charm as charm
 import charms.reactive.relations as relations
 
 import charmhelpers.core as ch_core
-from charmhelpers.core.hookenv import log
+from charmhelpers.core.hookenv import (
+    log,
+    config,
+)
 
 charms_openstack.bus.discover()
 
@@ -41,12 +44,18 @@ def setup_manila():
     }
 
 
+@reactive.when('config.changed.service-user')
+@reactive.when('identity-service.connected')
+def update_ident_username(keystone):
+    """Updates the user to the Identity Service"""
+    configure_ident_username(keystone)
+
+
 @reactive.when_not('identity-service.available')
 @reactive.when('identity-service.connected')
 def configure_ident_username(keystone):
-    """Requests a user to the Identity Service
-    """
-    username = 'manila'
+    """Requests a user to the Identity Service"""
+    username = config().get('service-user')
     keystone.request_credentials(username)
 
 

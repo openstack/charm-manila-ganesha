@@ -30,6 +30,10 @@ options:
     description: |
       A comma-separated list of nagios servicegroups. If left empty, the
       nagios_context will be used as the servicegroup.
+  service-user:
+    default: manila
+    type: string
+    description: Username used for keystone's service credential.
   rabbit-user:
     default: manila
     type: string
