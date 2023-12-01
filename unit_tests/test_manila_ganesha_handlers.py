@@ -50,6 +50,8 @@ class TestRegisteredHooks(test_utils.TestRegisteredHooks):
                                               'ganesha-pool-configured',),
                 'disable_services': ('cluster.connected',),
                 'configure_nrpe': ('nrpe-external-master.available',),
+                'update_ident_username': ('config.changed.service-user',
+                                          'identity-service.connected',),
             },
             'when_not': {
                 'ceph_connected': ('ganesha-pool-configured',),
