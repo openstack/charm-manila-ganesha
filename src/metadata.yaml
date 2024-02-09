@@ -7,12 +7,10 @@ description: |
   all these protocols concurrently. Manila-Ganesha allows connecting
   a Manila server to a Ceph cluster via CephFS.
 tags:
-- storage
-- file-servers
+  - storage
+  - file-servers
 series:
-- jammy
-- lunar
-- mantic
+  - jammy
 subordinate: false
 extra-bindings:
   tenant-storage:

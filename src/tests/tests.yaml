@@ -1,16 +1,13 @@
 charm_name: manila-ganesha
 
 gate_bundles:
-- jammy-antelope
-
+  - jammy-antelope
+  - jammy-bobcat
+  - jammy-caracal
 dev_bundles:
-- jammy-bobcat
-- lunar-antelope
-- mantic-bobcat
-
+  - noble-caracal
 smoke_bundles:
-- jammy-yoga
-
+  - jammy-caracal
 target_deploy_status: {}
 
 tests:
@@ -26,5 +23,4 @@ configure:
 
 tests_options:
   force_deploy:
-    - lunar-antelope
-    - mantic-bobcat
+    - noble-caracal
