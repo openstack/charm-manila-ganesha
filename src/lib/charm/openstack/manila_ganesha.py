@@ -203,7 +203,7 @@ class ManilaGaneshaCharm(charms_openstack.charm.HAOpenStackCharm,
         # 'manila-share',
     ]
     ha_resources = ['vips', 'dnsha']
-    release_pkg = 'manila-common'
+    version_package = release_pkg = 'manila-common'
 
     package_codenames = {
         'manila-common': collections.OrderedDict([
