@@ -2,8 +2,17 @@
     templates:
       - charm-unit-jobs-py310
       - charm-functional-jobs
+    check:
+      jobs:
+        - jammy-antelope-vault_manila-ganesha
     vars:
       needs_charm_build: true
       charm_build_name: manila-ganesha
       build_type: charmcraft
       charmcraft_channel: 2.1/stable
+
+- job:
+    name: jammy-antelope-vault_manila-ganesha
+    parent: func-target
+    vars:
+      tox_extra_args: '-- vault:jammy-antelope-vault'
