@@ -2,8 +2,17 @@
     templates:
       - charm-unit-jobs-py310
       - charm-zed-functional-jobs
+    check:
+      jobs:
+        - jammy-zed-vault_manila-ganesha
     vars:
       needs_charm_build: true
       charm_build_name: manila-ganesha
       build_type: charmcraft
       charmcraft_channel: 2.0/stable
+
+- job:
+    name: jammy-zed-vault_manila-ganesha
+    parent: func-target
+    vars:
+      tox_extra_args: '-- vault:jammy-zed-vault'
