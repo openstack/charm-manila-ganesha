@@ -9,8 +9,6 @@ description: |
 tags:
   - storage
   - file-servers
-series:
-  - jammy
 subordinate: false
 extra-bindings:
   tenant-storage:
