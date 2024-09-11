@@ -14,22 +14,30 @@
 
 import collections
 import errno
+import os
 import socket
 import subprocess
 
 import charms_openstack.charm
 import charms_openstack.adapters
 import charms_openstack.plugins
+import charms_openstack.charm.utils
 import charmhelpers.contrib.network.ip as ch_net_ip
+import charms.reactive.relations as relations
 from charmhelpers.core.host import (
     cmp_pkgrevno,
     service_pause,
+    mkdir,
+    path_hash,
+    write_file,
 )
 from charmhelpers.core.hookenv import (
+    ERROR,
     config,
     goal_state,
     local_unit,
     log,
+    network_get,
 )
 from charmhelpers.contrib.hahelpers.cluster import (
     is_clustered,
@@ -43,6 +51,10 @@ import charmhelpers.core as ch_core
 
 MANILA_DIR = '/etc/manila/'
 MANILA_CONF = MANILA_DIR + "manila.conf"
+MANILA_SSL_DIR = MANILA_DIR + "ssl/"
+MANILA_CLIENT_CERT_FILE = MANILA_SSL_DIR + "cert.crt"
+MANILA_CLIENT_KEY_FILE = MANILA_SSL_DIR + "cert.key"
+MANILA_CLIENT_CA_FILE = MANILA_SSL_DIR + "ca.crt"
 MANILA_LOGGING_CONF = MANILA_DIR + "logging.conf"
 MANILA_API_PASTE_CONF = MANILA_DIR + "api-paste.ini"
 CEPH_CONF = '/etc/ceph/ceph.conf'
@@ -146,6 +158,28 @@ class KeystoneCredentialAdapter(
         return self.credentials_username
 
 
+class TlsCertificatesAdapter(
+        charms_openstack.adapters.OpenStackRelationAdapter):
+    """Modifies the keystone-credentials interface to act like keystone."""
+
+    def _resolve_file_name(self, path):
+        if os.path.exists(path):
+            return path
+        return None
+
+    @property
+    def certfile(self):
+        return self._resolve_file_name(MANILA_CLIENT_CERT_FILE)
+
+    @property
+    def keyfile(self):
+        return self._resolve_file_name(MANILA_CLIENT_KEY_FILE)
+
+    @property
+    def cafile(self):
+        return self._resolve_file_name(MANILA_CLIENT_CA_FILE)
+
+
 class GaneshaCharmRelationAdapters(
         charms_openstack.adapters.OpenStackRelationAdapters):
     relation_adapters = {
@@ -154,6 +188,7 @@ class GaneshaCharmRelationAdapters(
         'manila-ganesha': charms_openstack.adapters.OpenStackRelationAdapter,
         'identity-service': KeystoneCredentialAdapter,
         'shared_db': charms_openstack.adapters.DatabaseRelationAdapter,
+        'certificates': TlsCertificatesAdapter,
     }
 
 
@@ -216,6 +251,10 @@ class ManilaGaneshaCharm(charms_openstack.charm.HAOpenStackCharm,
             ('12', 'wallaby'),
             ('13', 'xena'),
             ('14', 'yoga'),
+            ('15', 'zed'),
+            ('16', 'antelope'),
+            ('17', 'bobcat'),
+            ('18', 'caracal'),
         ]),
     }
 
@@ -404,6 +443,78 @@ class ManilaGaneshaCharm(charms_openstack.charm.HAOpenStackCharm,
                    'permissions': CEPH_CAPABILITIES,
                    'client': ch_core.hookenv.application_name()})
         ceph.send_request_if_needed(rq)
+
+    def get_client_cert_cn_sans(self):
+        """Get the tuple (cn, [sans]) for a client certificiate.
+
+        This is for the keystone endpoint/interface, so generate the client
+        cert data for that.
+        """
+        try:
+            ingress = network_get('identity-service')['ingress-addresses']
+        except Exception as e:
+            # if it didn't work, log it as an error, and return (None, None)
+            log(f"Getting ingress for identity-service failed: {str(e)}",
+                level=ERROR)
+            return (None, None)
+        return (ingress[0], ingress[1:])
+
+    def handle_changed_client_cert_files(self, ca, cert, key):
+        """Handle changes to client cert, key or ca.
+
+        If the client certs have changed on disk, rerender and restart manila.
+
+        The cert and key need to be written to:
+
+        - /etc/manila/ssl/cert.crt - MANILA_CLIENT_CERT_FILE
+        - /etc/manila/ssl/cert.key - MANILA_CLIENT_KEY_FILE
+        - /etc/manila/ssl/ca.cert  - MANILA_CLIENT_CA_FILE
+        """
+        # lives ensrure that the cert dir exists
+        mkdir(MANILA_SSL_DIR)
+        paths = {
+            MANILA_CLIENT_CA_FILE: ca,
+            MANILA_CLIENT_CERT_FILE: cert,
+            MANILA_CLIENT_KEY_FILE: key,
+        }
+        checksums = {path: path_hash(path) for path in paths.keys()}
+        # write or remove the files.
+        for path, contents in paths.items():
+            if contents is None:
+                # delete the file
+                realpath = os.path.abspath(path)
+                path_exists = os.path.exists(realpath)
+                if path_exists:
+                    try:
+                        os.remove(path)
+                    except OSError as e:
+                        log("Path {} couldn't be deleted: {}"
+                            .format(path, str(e)), level=ERROR)
+            else:
+                write_file(path,
+                           contents.encode(),
+                           owner=self.user,
+                           group=self.group,
+                           perms=0o640)
+        new_checksums = {path: path_hash(path) for path in paths.keys()}
+        if new_checksums != checksums:
+            interfaces = (
+                'ceph.available',
+                'amqp.available',
+                'manila-plugin.available',
+                'shared-db.available',
+                'identity-service.available',
+                'certificates.available',
+            )
+            # check all the interfaces are available
+            endpoints = []
+            for interface in interfaces:
+                endpoint = relations.endpoint_from_flag(interface)
+                if not endpoint:
+                    # if not available don't attempt to render
+                    return
+                endpoints.append(endpoint)
+            self.render_with_interfaces(endpoints)
 
 
 class ManilaGaneshaUssuriCharm(ManilaGaneshaCharm,

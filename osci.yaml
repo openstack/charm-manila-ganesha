@@ -3,7 +3,16 @@
       - charm-unit-jobs-py38
       - charm-unit-jobs-py310
       - charm-yoga-functional-jobs
+    check:
+      jobs:
+        - jammy-yoga-vault_manila-ganesha
     vars:
       needs_charm_build: true
       charm_build_name: manila-ganesha
       build_type: charmcraft
+
+- job:
+    name: jammy-yoga-vault_manila-ganesha
+    parent: func-target
+    vars:
+      tox_extra_args: '-- vault:jammy-yoga-vault'

@@ -24,7 +24,10 @@ charm.use_defaults(
     'config.changed',
     'update-status',
     'upgrade-charm',
-    'certificates.available',
+    # TODO: remove follwoing commented out code.
+    # remove certificates.available as we want to wire in the call ourselves
+    # directly.
+    # 'certificates.available',
 )
 
 
@@ -79,7 +82,14 @@ def render_things(*args):
                             level=ch_core.hookenv.INFO)
         charm_instance.configure_ceph_keyring(ceph_relation.key)
 
-        charm_instance.render_with_interfaces(args)
+        # add in optional certificates.available relation for https to keystone
+        certificates = relations.endpoint_from_flag('certificates.available')
+        if certificates:
+            interfaces = list(args) + [certificates]
+        else:
+            interfaces = list(args)
+
+        charm_instance.render_with_interfaces(interfaces)
 
         reactive.set_flag('config.rendered')
         charm_instance.assess_status()
@@ -155,3 +165,65 @@ def disable_services():
     # based on the expectation of multiple units via goal-state
     ch_core.host.service('unmask', 'manila-share')
     reactive.set_flag('services-disabled')
+
+
+@reactive.when('certificates.ca.available')
+def install_root_ca_cert():
+    print("running install_root_ca_cert")
+    cert_provider = relations.endpoint_from_flag('certificates.ca.available')
+    if cert_provider:
+        print("cert_provider lives")
+        update_client_certs_and_ca(cert_provider)
+
+
+@reactive.when('certificates.available')
+def set_client_cert_request():
+    """Set up the client certificate request.
+
+    If the charm is related to vault then it will send a client cert request
+    (set it on the relation) so that the keystone auth can be configured with a
+    client cert, key and CA to authenticate with keystone (HTTP).
+    """
+    print("running set_client_cert_request")
+    cert_provider = relations.endpoint_from_flag('certificates.available')
+    if cert_provider:
+        print("cert_provider lives")
+        with charm.provide_charm_instance() as the_charm:
+            client_cn, client_sans = the_charm.get_client_cert_cn_sans()
+            print(f"client_cn: {client_cn}, client_sans: {client_sans}")
+            if client_cn:
+                cert_provider.request_client_cert(client_cn, client_sans)
+
+
+@reactive.when('certificates.certs.available')
+def update_client_cert():
+    print("running update_client_cert")
+    cert_provider = relations.endpoint_from_flag('certificates.available')
+    if cert_provider:
+        print("cert_provider lives")
+        update_client_certs_and_ca(cert_provider)
+
+
+def update_client_certs_and_ca(cert_provider):
+    """Get the CA, and client cert, key and then update the config."""
+    ca = cert_provider.root_ca_cert
+    chain = cert_provider.root_ca_chain
+    if ca and chain:
+        if ca not in chain:
+            ca = chain + ca
+        else:
+            ca = chain
+    cert = key = None
+    try:
+        client_cert = cert_provider.client_certs[0]  # only requested one cert
+        cert = client_cert.cert
+        key = client_cert.key
+    except IndexError:
+        pass
+    with charm.provide_charm_instance() as the_charm:
+        print(f"updating: {ca}\n{cert}\n{key}")
+        if ca:
+            the_charm.configure_ca(ca)
+        if chain:
+            the_charm.configure_ca(chain, postfix="chain")
+        the_charm.handle_changed_client_cert_files(ca, cert, key)
