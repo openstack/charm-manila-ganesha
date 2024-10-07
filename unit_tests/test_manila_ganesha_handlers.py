@@ -52,6 +52,9 @@ class TestRegisteredHooks(test_utils.TestRegisteredHooks):
                 'configure_nrpe': ('nrpe-external-master.available',),
                 'update_ident_username': ('config.changed.service-user',
                                           'identity-service.connected',),
+                'install_root_ca_cert': ('certificates.ca.available',),
+                'set_client_cert_request': ('certificates.available',),
+                'update_client_cert': ('certificates.certs.available',),
             },
             'when_not': {
                 'ceph_connected': ('ganesha-pool-configured',),
