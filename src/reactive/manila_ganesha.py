@@ -22,8 +22,7 @@ charm.use_defaults(
     'shared-db.connected',
     'config.changed',
     'update-status',
-    'upgrade-charm',
-    # TODO: remove follwoing commented out code.
+    # TODO: remove following commented out code.
     # remove certificates.available as we want to wire in the call ourselves
     # directly.
     # 'certificates.available',
