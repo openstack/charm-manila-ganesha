@@ -23,6 +23,7 @@ import charms_openstack.adapters
 import charms_openstack.plugins
 import charms_openstack.charm.utils
 import charmhelpers.contrib.network.ip as ch_net_ip
+import charms.reactive as reactive
 import charms.reactive.relations as relations
 from charmhelpers.core.host import (
     cmp_pkgrevno,
@@ -302,9 +303,19 @@ class ManilaGaneshaCharm(charms_openstack.charm.HAOpenStackCharm,
         _goal_state = goal_state()
         peers = (key for key in _goal_state['units']
                  if '/' in key and key != local_unit())
-        if len(list(peers)) > 0:
+        if (not reactive.is_flag_set('is-upgrade-charm') and
+                len(list(peers)) > 0):
             service_pause('manila-share')
+
         super().install()
+
+    def upgrade_charm(self):
+        """ Override the default so we can set a flag before it runs. """
+        reactive.set_flag('is-upgrade-charm')
+        try:
+            super().upgrade_charm()
+        finally:
+            reactive.clear_flag('is-upgrade-charm')
 
     def service_restart(self, service_name):
         res_name = self.service_to_resource_map.get(service_name, None)
