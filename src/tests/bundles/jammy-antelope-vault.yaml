@@ -39,7 +39,7 @@ machines:
   '23':
   '24':
 
-services:
+applications:
 
   manila-mysql-router:
     charm: ch:mysql-router
